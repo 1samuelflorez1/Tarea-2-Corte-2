@@ -14,6 +14,8 @@ import {
 import { AuthGuard } from '@nestjs/passport';
 
 import { PositiveIntPipe } from '../../common/pipes/positive-int-pipe';
+import { PermissionsGuard } from '../guards/permissions/permissions.guard';
+import { Permissions } from '../decorators/permissions.decorator';
 
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -31,7 +33,8 @@ export class UserController {
 
     @Get()
     @HttpCode(HttpStatus.OK)
-    @UseGuards(AuthGuard('jwt'))
+    @UseGuards(AuthGuard('jwt'), PermissionsGuard)
+    @Permissions('manage_users')
     findAll() {
         return this.userService.findAll();
     }
