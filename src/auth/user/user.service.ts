@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Between, ILike, IsNull, Not, Repository } from 'typeorm';
+import * as bcrypt from 'bcrypt';
 
 import { RoleNotFoundException, UserNotFoundException } from '../../common/exceptions';
 import { User } from '../entities/user.entity';
@@ -23,8 +24,13 @@ export class UserService {
             throw new RoleNotFoundException(createUserDto.roleId);
         }
 
+        // Transformación (Hashing) de la contraseña
+        // i.e password123 -> $2b$10$hashedpassword1
+        const passwordHashed = await bcrypt.hash(createUserDto.passwordHash, 10);
+
         const newUser = this.userRepository.create({
             ...createUserDto,
+            passwordHash: passwordHashed,
             role,
         });
         return await this.userRepository.save(newUser);
@@ -34,6 +40,19 @@ export class UserService {
         return this.userRepository.find({
             relations: {
                 role: true,
+            },
+        });
+    }
+
+    findByEmail(email: string) {
+        return this.userRepository.findOne({
+            where: { email },
+            relations: {
+                role: {
+                    rolePermissions: {
+                        permission: true,
+                    },
+                },
             },
         });
     }
