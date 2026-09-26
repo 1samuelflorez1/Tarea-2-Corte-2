@@ -3,8 +3,9 @@ import { JwtModule } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import type { StringValue } from 'ms';
 
-import { UserModule } from './user/user.module';
-import { RoleModule } from './role/role.module';
+import { UserModule } from './modules/user/user.module';
+import { RoleModule } from './modules/role/role.module';
+import { PermissionModule } from './modules/permission/permission.module';
 import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
 import { JwtStrategy } from './strategies/jwt.strategy';
@@ -13,6 +14,7 @@ import { JwtStrategy } from './strategies/jwt.strategy';
     imports: [
         UserModule,
         RoleModule,
+        PermissionModule,
         JwtModule.registerAsync({
             inject: [ConfigService],
             useFactory: (config: ConfigService) => ({
@@ -25,5 +27,6 @@ import { JwtStrategy } from './strategies/jwt.strategy';
     ],
     providers: [AuthService, JwtStrategy],
     controllers: [AuthController],
+    exports: [AuthService, UserModule, RoleModule, PermissionModule],
 })
 export class AuthModule {}

@@ -1,24 +1,28 @@
-import { IsEmail, IsNotEmpty, IsOptional, IsString, MaxLength, MinLength } from 'class-validator';
+import { IsEmail, IsNotEmpty, IsNumber, IsOptional, IsString, MaxLength, MinLength } from 'class-validator';
 
 export class CreateUserDto {
     @IsString({ message: 'El nombre de usuario debe ser una cadena de texto' })
     @IsNotEmpty({ message: 'El nombre de usuario es obligatorio' })
     @MinLength(3, { message: 'El nombre de usuario debe contener al menos 3 caracteres' })
+    @MaxLength(50, { message: 'El nombre de usuario no puede exceder 50 caracteres' })
     username: string;
 
     @IsEmail({}, { message: 'Debe ingresar un correo electrónico válido' })
     @IsNotEmpty({ message: 'El correo electrónico es requerido' })
+    @MaxLength(255, { message: 'El correo electrónico no puede exceder 255 caracteres' })
     email: string;
 
-    @IsString()
+    @IsString({ message: 'La contraseña debe ser una cadena de texto' })
+    @IsNotEmpty({ message: 'La contraseña es requerida' })
     @MinLength(8, { message: 'La contraseña debe tener mínimo 8 caracteres' })
     passwordHash: string;
 
     @IsOptional()
-    @IsString()
+    @IsString({ message: 'La biografía debe ser una cadena de texto' })
     @MaxLength(200, { message: 'La biografía no puede exceder 200 caracteres' })
     bio?: string;
 
     @IsNotEmpty({ message: 'Debe especificar el id del rol del usuario' })
+    @IsNumber({}, { message: 'El id del rol debe ser un número' })
     roleId: number;
 }

@@ -1,8 +1,8 @@
-import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
+ï»¿import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 
-import { UserService } from './user/user.service';
+import { UserService } from './modules/user/user.service';
 import { UserLoginDto } from './dto/user-login.dto';
 import { JwtPayload } from './interfaces/jwt-payload.interface';
 
@@ -14,7 +14,6 @@ export class AuthService {
     ) {}
 
     async validateUser(email: string, pass: string) {
-        // findByEmail debe cargar las relaciones de roles y permisos
         const user = await this.usersService.findByEmail(email);
         if (!user) {
             throw new NotFoundException('Usuario no encontrado');
@@ -22,7 +21,7 @@ export class AuthService {
 
         const isMatch = await bcrypt.compare(pass, user.passwordHash);
         if (!isMatch) {
-            throw new UnauthorizedException('Credenciales inválidas');
+            throw new UnauthorizedException('Credenciales invalidas');
         }
 
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -33,7 +32,6 @@ export class AuthService {
     async login(userLoginDto: UserLoginDto) {
         const user = await this.validateUser(userLoginDto.email, userLoginDto.password);
 
-        // Mapeamos los permisos asociados al rol del usuario
         const permissions = user.role?.rolePermissions?.map((rp) => rp.permission.name) ?? [];
 
         const payload: JwtPayload = {
