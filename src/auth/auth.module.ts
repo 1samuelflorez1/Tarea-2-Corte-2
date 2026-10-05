@@ -8,6 +8,13 @@ import { RoleModule } from './role/role.module';
 import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
 import { JwtStrategy } from './strategies/jwt.strategy';
+import { ActivityExerciseModule } from './activity_exercise/activity_exercise.module';
+import { RoutineExerciseModule } from './routine_exercise/routine_exercise.module';
+import { RoutineModule } from './routine/routine.module';
+import { RolePermissionModule } from './role_permission/role_permission.module';
+import { PermissionModule } from './permission/permission.module';
+import { ExerciseModule } from './exercise/exercise.module';
+import { ActivityLogModule } from './activity_log/activity_log.module';
 
 @Module({
     imports: [
@@ -22,6 +29,13 @@ import { JwtStrategy } from './strategies/jwt.strategy';
                 },
             }),
         }),
+        ActivityExerciseModule,
+        ActivityLogModule,
+        ExerciseModule,
+        PermissionModule,
+        RolePermissionModule,
+        RoutineModule,
+        RoutineExerciseModule,
     ],
     providers: [AuthService, JwtStrategy],
     controllers: [AuthController],

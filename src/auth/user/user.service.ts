@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ConfigService } from '@nestjs/config';
 import { Between, ILike, IsNull, Not, Repository } from 'typeorm';
@@ -106,7 +106,9 @@ export class UserService {
     //     });
     // }
 
-    async update(id: number, updateUserDto: UpdateUserDto) {
+    async update(id: number, updateUserDto: UpdateUserDto): Promise<User> {
+        const user = await this.findOne(id);
+
         if (updateUserDto.roleId) {
             const role = await this.roleService.findOne(updateUserDto.roleId);
             if (!role) {
@@ -114,18 +116,15 @@ export class UserService {
             }
         }
 
-        await this.findOne(id);
-        await this.userRepository.update(id, updateUserDto);
-        return this.findOne(id);
+        const updatedUser = this.userRepository.merge(user, updateUserDto);
+        return await this.userRepository.save(updatedUser);
     }
 
-    async remove(id: number) {
-        await this.findOne(id);
+    async remove(id: number): Promise<void> {
         const result = await this.userRepository.delete(id);
-        if (result.affected) {
-            return { id };
+        if (result.affected === 0) {
+            throw new NotFoundException(`No fue posible eliminar el usuario con ID ${id}`);
         }
-        return null;
     }
 
     /**

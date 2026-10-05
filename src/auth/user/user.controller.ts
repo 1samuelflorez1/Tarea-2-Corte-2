@@ -33,8 +33,8 @@ export class UserController {
 
     @Get()
     @HttpCode(HttpStatus.OK)
-    @UseGuards(AuthGuard('jwt'), PermissionsGuard)
-    @Permissions('manage_users')
+    // @UseGuards(AuthGuard('jwt'), PermissionsGuard)
+    // @Permissions('manage_users')
     findAll() {
         return this.userService.findAll();
     }

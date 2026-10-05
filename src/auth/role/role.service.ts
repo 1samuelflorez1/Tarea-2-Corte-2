@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { ILike, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 
@@ -27,17 +27,21 @@ export class RoleService {
         return await this.roleRepository.findOneBy({ id });
     }
 
-    async update(id: number, updateRoleDto: UpdateRoleDto): Promise<Role | null> {
-        await this.roleRepository.update(id, updateRoleDto);
-        return await this.roleRepository.findOneBy({ id });
+    async update(id: number, updateRoleDto: UpdateRoleDto): Promise<Role> {
+        const role = await this.roleRepository.findOneBy({ id });
+        if (!role) {
+            throw new NotFoundException(`Role with id ${id} not found`);
+        }
+
+        const updatedRole = this.roleRepository.merge(role, updateRoleDto);
+        return await this.roleRepository.save(updatedRole);
     }
 
-    async remove(id: number): Promise<{ id: number } | null> {
+    async remove(id: number): Promise<void> {
         const result = await this.roleRepository.delete(id);
-        if (result.affected) {
-            return { id };
+        if (result.affected === 0) {
+            throw new NotFoundException(`No fue posible eliminar el rol con ID ${id}`);
         }
-        return null;
     }
 
     /**
